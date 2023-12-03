@@ -1,6 +1,3 @@
 [submodule "flanterm"]
 	path = flanterm
 	url = https://github.com/mintsuki/flanterm.git
-[submodule "external/dtc"]
-	path = external/dtc
-	url = git://git.kernel.org/pub/scm/utils/dtc/dtc.git

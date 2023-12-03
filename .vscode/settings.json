@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "GitHub Copilot": "javascript",
+        "*.jinja2": "html",
+        "fb.h": "c"
+    }
+}
