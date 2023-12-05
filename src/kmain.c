@@ -4,8 +4,10 @@
 #include <panic.h>
 #include <terminal.h>
 #include <log.h>
+#include <acpi.h>
 #include <utils.h>
 
+extern uint64_t _exception_vector;
 static void kmain(void);
 
 LIMINE_BASE_REVISION(1)
@@ -39,6 +41,28 @@ struct limine_stack_size_request _stack = {
     .stack_size = 128*1024 // 128 kb
 };
 
+void process_memory(struct limine_memmap_entry* e) {
+    switch(e->type) {
+        case LIMINE_MEMMAP_FRAMEBUFFER:
+            log_info("Found a memory block - Framebuffer");
+            break;
+        case LIMINE_MEMMAP_USABLE:
+            log_info("Found a memory block - Usable");
+            break;
+        case LIMINE_MEMMAP_RESERVED:
+            log_info("Found a memory block - Reserved");
+            break;
+        case LIMINE_MEMMAP_ACPI_RECLAIMABLE:
+            log_info("Found a memory block - ACPI. Parsing RSPD...");
+            init_rspd(e->base);
+            break;
+    }
+}
+
+void kfault() {
+    panic("Fault!");
+}
+
 static void kmain() {
     if (LIMINE_BASE_REVISION_SUPPORTED == false) {
         early_panic();
@@ -55,14 +79,17 @@ static void kmain() {
 
     tprintf("Booted via %s (version: %s)\n", bootloader_info.response->name, bootloader_info.response->version);
 
+    log_info("basic io init ok");
+
+    log_info("setupping vector table (interrupts omg)");
+
+    set_vbar_el1(&_exception_vector);
+
     struct limine_memmap_response *memmap_response = memmap_request.response;
-    
     for (size_t i = 0; i < memmap_response->entry_count; i++) {
         struct limine_memmap_entry *e = memmap_response->entries[i];
-        tprintf("%x->%x %s\n", e->base, e->base + e->length, get_memmap_type(e->type));
+        process_memory(e);
     }
-
-    log_info("pre init ok");
 
     log_info("OK");
 

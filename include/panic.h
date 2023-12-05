@@ -5,7 +5,7 @@
 
 static inline void early_panic() {
     // 0xDEADBEEF
-    
+    asm volatile("ldr x0, =0xdeadbeef");
     asm("wfi");
     asm("wfe");
     for(;;)

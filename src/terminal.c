@@ -7,7 +7,7 @@
 #include <stdarg.h>
 #include <utils.h>
 
-void int_to_hex(unsigned int value, char *buffer) {
+void int_to_hex(unsigned long value, char *buffer) {
     const char hex_chars[] = "0123456789abcdef";
     int i = 0;
 
@@ -43,6 +43,7 @@ int terminal_init(struct limine_framebuffer *fb) {
 
 int print(const char* string, size_t len) {
     flanterm_write(ft_ctx, string, len);
+	return 1;
 }
 
 int tprintf(const char* restrict format, ...) {
@@ -97,7 +98,7 @@ int tprintf(const char* restrict format, ...) {
 			written += len;
         } else if (*format == 'x') {
             format++;
-            unsigned int value = va_arg(parameters, unsigned int);
+            unsigned int value = va_arg(parameters, unsigned long);
             char buffer[20]; // предположим, что числа не будут очень большими
             int_to_hex(value, buffer);
             print(buffer, strlen(buffer));
